@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语音输入对话</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color:#228b22; /* 头部导航栏背景色 */
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 样式化侧边栏导航 */
+        /* 样式化侧边栏导航 */
+        nav {
+            background-color: #f5f5f5; /* 侧边栏背景色 */
+            padding: 20px 0;
+            width: 180px; /* 调整侧边栏宽度 */
+            position: fixed;
+            top: 60px; /* 留出头部导航栏的空间 */
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        nav ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        nav ul li {
+            margin-bottom: 20px;
+        }
+
+        nav ul li a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            width: 80px; /* 气泡的直径 */
+            height: 80px; /* 气泡的直径 */
+            border-radius: 50%; /* 圆形按钮 */
+            background: linear-gradient(to bottom, #228b22, #45a049); /* 渐变背景 */
+            text-align: center;
+            line-height: 80px; /* 垂直居中文本 */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 过渡效果 */
+            font-family: 'Roboto', sans-serif; /* 使用现代清晰的字体 */
+            font-weight: bold; /* 加粗字体 */
+            text-transform: uppercase; /* 大写字母 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        }
+
+        nav ul li a:hover {
+            background: linear-gradient(to bottom, #45a049, #228b22); /* 鼠标悬停时的渐变背景 */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 鼠标悬停时的阴影效果 */
+        }
+
+
+        .main-content {
+            margin-left: 200px; /* 调整侧边栏宽度 + 20px 的间隔 */
+            padding-top: 80px; /* 留出头部导航栏的空间 */
+            padding-left: 20px;
+            padding-right: 20px;
+            width: calc(100% - 200px); /* 主内容区域宽度 */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .section {
+            width: calc(100% - 40px); /* 每个部分占100%宽度 */
+            max-width: 1000px; /* 设置最大宽度 */
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-bottom: 20px;
+            max-height: 0; /* 初始高度为0 */
+            overflow: hidden;
+            opacity: 0; /* 初始透明度为0 */
+            transition: max-height 0.5s ease, opacity 0.5s ease; /* 过渡效果 */
+        }
+
+        .section.active {
+            max-height: 800px; /* 根据需要调整高度 */
+            opacity: 1;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button, .custom-file-upload {
+            background-color: #228b22;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            display: inline-block;
+        }
+
+        button:hover, .custom-file-upload:hover {
+            background-color: #228b22;
+        }
+
+        #result, #response-text, #translation-text, #response-text-offline {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        textarea {
+            width: 100%; /* 设置宽度为100% */
+            padding: 10px; /* 设置内边距 */
+            margin-bottom: 10px; /* 设置下边距 */
+            font-size: 16px; /* 设置字体大小 */
+            border: 1px solid #ccc; /* 设置边框 */
+            border-radius: 4px; /* 设置边框圆角 */
+            resize: none; /* 禁止调整大小 */
+        }
+        label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        select {
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        select:hover,
+        select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Optional: Adjust appearance on focus or hover */
+        select:focus {
+            box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+        }
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">语音识别</div>
+            <a style="color: white;" href = "http://www.baidu.com">关于</a>
+            <nav>
+                <ul>
+                    <li><a href="#voice-response" data-target="voice-response">在线识别</a></li>
+                    <li><a href="#offline-voice" data-target="offline-voice">离线识别</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="section" id="voice-response">
+            <h1>在线识别</h1>
+               <div class="container" id="voice-response-container">
+                <button id="record-btn">开始录音</button>
+                <div id="result"></div>
+                <div class="response-container">
+                    <button id="update-response-btn">AI回应</button>
+                    <textarea id="response-text" rows="4" placeholder="AI的回应会显示在这里..."></textarea>
+                </div>
+                <div class="translation-container">
+                    <button id="update-translation-btn">翻译</button>
+                    <label for="languages">翻译语言：</label>
+                    <select id="languages" name="languages">
+                        <option value="en">英语</option>
+                        <option value="fra">法语</option>
+                        <option value="zh">中文</option>
+                        <option value="de">德语</option>
+                        <option value="ru">俄罗斯语</option>
+                    </select>
+                    <textarea id="translation-text" rows="4" placeholder="语音翻译结果将显示在这里..."></textarea>
+                </div>
+            </div>
+        </div>    
+        
+        <div class="section" id="offline-voice">
+            <h1>离线识别</h1>
+            <div class="container" id="offline-voice-container">
+                <label for="file-upload" class="custom-file-upload">选择音频文件</label>
+                <input type="file" id="file-upload" accept=".wav">
+                <textarea id="response-text-offline" rows="4" placeholder="识别文本将在这里显示..."></textarea>
+            </div>
+        </div>
+    
+    </div>
+
+    <script>
+            let text  = "";
+            let index = 0;
+            function typeWriter() {
+                if (index < text.length) {
+                    textarea = document.getElementById('response-text');
+                    textarea.value += text.charAt(index);
+                    index++;
+                    setTimeout(typeWriter, 50); // 调整延迟时间可以控制文字显示速度
+                }
+            }
+        document.addEventListener('DOMContentLoaded', function() {
+            const voiceResponseSection = document.getElementById('voice-response');
+            voiceResponseSection.classList.add('active');
+            const navLinks = document.querySelectorAll('nav ul li a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const targetId = this.getAttribute('data-target');
+                    const sections = document.querySelectorAll('.section');
+                    sections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+
+        let conversationHistory = []; // 保存对话历史
+        let result; 
+        document.getElementById('record-btn').addEventListener('click', startRecording);
+        document.getElementById('update-response-btn').addEventListener('click', updateAIResponse);
+        document.getElementById('update-translation-btn').addEventListener('click', translation);
+
+        document.getElementById('file-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0]; // 获取用户选择的文件
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                fetch('/speech-recognition', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('后端回复:', data.response);
+                    document.getElementById('response-text-offline').value = data.response;
+                })
+                .catch((error) => {
+                    console.error('错误:', error);
+                });
+            } else {
+                console.error('未选择文件');
+            }
+        });
+
+        function startRecording() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'zh-CN'; // 设置识别语言为中文
+            recognition.start();
+            
+            recognition.onresult = function(event) {
+                result = event.results[0][0].transcript;
+                console.debug(result);
+                document.getElementById('result').textContent = 'User:' + result;
+                conversationHistory.push({ role: 'user', content: result }); // 添加用户输入到对话历史
+            };
+
+            recognition.onerror = function(event) {
+                console.error('语音识别错误', event.error);
+            };
+        }
+
+        function updateAIResponse() {
+            // 模拟更新AI回应
+            document.getElementById('response-text').value = "请等待....";
+            sendDataToBackend(result);
+        }
+
+        function updateTranslation() {
+            const newTranslation = '这是新的语音翻译结果';
+            document.getElementById('translation-text').value = newTranslation;
+        }
+
+        function sendDataToBackend(data) {
+            console.log(data);
+            fetch('/ai-response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ speech: data })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('后端回复:', data.response);
+                text = data.response;
+                // 将 AI 的回答显示在文本框中
+                document.getElementById('response-text').value = "";
+                typeWriter();
+                index = 0;
+                console.log(index);
+            })
+            .catch((error) => {
+                console.error('错误:', error);
+            });
+        }
+
+        function translation() {
+            console.log(result);
+            fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: result })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('后端回复:', data.translation);
+                // 将 AI 的回答显示在文本框中
+                document.getElementById('translation-text').value = data.translation;
+            })
+            .catch((error) => {
+                console.error('错误:', error);
+            });
+        }
+
+        document.getElementById("languages").addEventListener('change', function() {
+        const selectedLanguage = this.value;
+        console.log(selectedLanguage);
+        fetch('/set_language', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ language: selectedLanguage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+            // 在此处处理语言切换后的逻辑，比如刷新页面或更新内容
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+    </script>
+</body>
+</html>
